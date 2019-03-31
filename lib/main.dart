@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
@@ -63,8 +64,11 @@ void initState()
 
   @override
   Widget build(BuildContext context) {
+    final key = new GlobalKey<ScaffoldState>();
     // TODO: implement build
     return Scaffold(
+
+      key: key,
       backgroundColor: Colors.amberAccent,
       body: new Center(
         child: Column(
@@ -72,22 +76,82 @@ void initState()
           children: <Widget>[
             new FutureBuilder<Jokes>(
               future:
-                  getData(), //sets the getQuote method as the expected Future
+                  getData(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   //checks if the response returns valid data
                   return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(snapshot.data.setup), //displays the quote
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Text(
-                            " - ${snapshot.data.punchline}"), //displays the quote's author
-                      ],
-                    ),
+
+
+                      child: Column(
+
+                        //mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+
+                          Container(
+                            color:Colors.white,
+                            margin: new EdgeInsets.only(
+
+                              bottom: 100.0,
+                            ),
+                            child: Text(
+                                "Random Jokes Generator",
+                              style: TextStyle(fontSize: 28.0, fontFamily: "Roboto"),
+                            ),
+                          ),
+
+                          Container(
+
+                            child: Column(
+
+                              children: <Widget>[
+
+                                new GestureDetector(
+
+                                  child: new Text(
+                                    snapshot.data.setup ,
+                                    style: TextStyle(fontFamily: "Roboto", fontSize: 27.0 ),
+
+                                  ),
+                                  onLongPress: ()
+                                  {
+                                    Clipboard.setData(new ClipboardData(text: snapshot.data.setup, ));
+                                    key.currentState.showSnackBar(
+                                        new SnackBar(content: new Text("Copied to Clipboard"),));
+                                  },
+                                ),
+
+                                SizedBox(
+                                  height: 10.0,
+                                ),
+
+                                new GestureDetector(
+
+                                  child: new Text(
+                                    " - ${snapshot.data.punchline}",
+                                    style: TextStyle(fontFamily: "Roboto", fontSize: 17.0),
+                                  ),
+
+                                  onLongPress: ()
+                                  {
+
+                                    Clipboard.setData(new ClipboardData(text: snapshot.data.punchline));
+                                    key.currentState.showSnackBar(
+                                        new SnackBar(content: new Text("Copied to Clipboard"),));
+                                  },
+
+                                ),
+
+                              ],
+
+                            ),
+
+                          ),
+
+
+
+                        ],
+                      ),
                   );
                 } else if (snapshot.hasError) {
                   //checks if the response throws an error
@@ -97,7 +161,7 @@ void initState()
               },
             ),
             SizedBox(
-              height: 20.0,
+              height: 25.0,
             ),
             new RaisedButton(
                 onPressed: changeApi,
@@ -123,3 +187,4 @@ class Jokes {
     return Jokes(setup: json['setup'], punchline: json['punchline']);
   }
 }
+
